@@ -16,10 +16,10 @@ static void mcpwm_example_gpio_initialize()
 {
     printf("initializing mcpwm gpio...\n");
     mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, GPIO_PWM0A_OUT);
-    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, GPIO_PWM0B_OUT);
+    //mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, GPIO_PWM0B_OUT);
 }
 
-static void gpio_test_signal(void *arg)
+static void gpio_test_signal()
 {
     printf("intializing test signal...\n");
     gpio_config_t gp;
@@ -28,10 +28,10 @@ static void gpio_test_signal(void *arg)
     gp.pin_bit_mask = GPIO_SEL_12;  // GPIO 12
     gpio_config(&gp);
     while (1) {
-        gpio_set_level(GPIO_NUM_12, 1); //Set high
-        vTaskDelay(10);                 //delay of 10ms
-        gpio_set_level(GPIO_NUM_12, 0); //Set low
-        vTaskDelay(10);                 //delay of 10ms
+        gpio_set_level(GPIO_NUM_12, 1);		//Set high
+        vTaskDelay(10 / portTICK_RATE_MS);	//delay of 10ms
+        gpio_set_level(GPIO_NUM_12, 0);		//Set low
+        vTaskDelay(10 / portTICK_RATE_MS);	//delay of 10ms
     }
 }
 
@@ -43,9 +43,9 @@ static void mcpwm_example_config(void *arg)
     //2. initialize mcpwm configuration
     printf("Configuring Initial Parameters of mcpwm...\n");
     mcpwm_config_t pwm_config;
-    pwm_config.frequency = 1000;    //frequency = 1000Hz
-    pwm_config.cmpr_a = 50.0;       //duty cycle of PWMxA = 50.0%
-    pwm_config.cmpr_b = 10.0;       //duty cycle of PWMxb = 10.0%
+    pwm_config.frequency = 1001;    //frequency = 1000Hz
+    pwm_config.cmpr_a = 90.1;       //duty cycle of PWMxA = 50.0%
+    //pwm_config.cmpr_b = 10.1;       //duty cycle of PWMxb = 10.0%
     pwm_config.counter_mode = MCPWM_UP_COUNTER;
     pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
     mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);   //Configure PWM0A & PWM0B with above settings
@@ -57,5 +57,6 @@ void app_main()
 {
     printf("Testing MCPWM...\n");
     xTaskCreate(mcpwm_example_config, "mcpwm_example_config", 4096, NULL, 5, NULL);
+    gpio_test_signal();
 }
 
